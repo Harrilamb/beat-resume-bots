@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+<p>
+Paste job description in textarea below.
+</p>
+<textarea id="desc"></textarea>
+<button id="check">Find Keywords</button>
+<div id="res"></div>
+</body>
+</html>
+<script>
+$(document).ready(function(){
+  
+  $("#check").click(function(){
+    //past tense verbs
+    var ptv = {};
+    //present tense verbs
+    var prv = {};
+    //big words
+    var bw = {};
+    //proper nouns
+    var pn = {};
+    //other words
+    var ow = {};
+  	$("#res").empty();
+  	var x = $("#desc").val();
+    var separators = [' ','  ', '\\.','\\,', '\\n','\\t', '\\\+', '-', '\\\(', '\\\)', '\\*', ':', '\\\?'];
+    var s = x.split(new RegExp(separators.join('|'), 'g'));
+    for(var i in  s){
+    	  
+      if(s[i].replace(/[^A-Z]/g, "").length>1){
+      	if(pn.hasOwnProperty(s[i])){
+            pn[s[i]]++;
+          }else{
+            pn[s[i]]=1;
+          }
+      }
+      s[i]=s[i].toLowerCase();
+    	if(s[i].slice(-2)=='ed'){
+      	if(ptv.hasOwnProperty(s[i])){
+        	ptv[s[i]]++;
+        }else{
+        	ptv[s[i]]=1;
+        }
+			}
+      
+      if(s[i].slice(-3)=='ing'){
+      	if(prv.hasOwnProperty(s[i])){
+        	prv[s[i]]++;
+        }else{
+        	prv[s[i]]=1;
+        }
+      }
+      
+      if(s[i].length>8){
+        if(!ptv.hasOwnProperty(s[i]) && !prv.hasOwnProperty(s[i]) && !pn.hasOwnProperty(s[i])){
+          if(bw.hasOwnProperty(s[i])){
+            bw[s[i]]++;
+          }else{
+            bw[s[i]]=1;
+          }
+        }
+      }
+      
+      if(s[i].slice(-3)=='ine' || s[i].slice(-2)=='ly' || s[i].slice(-2)=='al'){
+      	if(ow.hasOwnProperty(s[i])){
+        	ow[s[i]]++;
+        }else{
+        	ow[s[i]]=1;
+        }
+      }
+      
+		}
+    
+    //past tense verbs sorted
+    var ptvs=[];
+    //present tense verbs sorted
+    var prvs=[];
+    //big words sorted
+    var bws = [];
+    //proper nouns sorted
+    var pns = [];
+    //other words sorted
+    var ows = [];
+    for(a in ptv){
+     ptvs.push([a,ptv[a]]);
+    }
+    for(a in prv){
+    	prvs.push([a,prv[a]]);
+    }
+    for(a in bw){
+    	if(bw[a]>1){
+    		bws.push([a,bw[a]]);
+      }
+    }
+    for(a in pn){
+    	pns.push([a,pn[a]]);
+    }
+    for(a in ow){
+    	ows.push([a,ow[a]]);
+    }
+    ptvs.sort(function(a,b){return a[1] - b[1]}).reverse();
+    prvs.sort(function(a,b){return a[1] - b[1]}).reverse();
+    bws.sort(function(a,b){return a[1] - b[1]}).reverse();
+    pns.sort(function(a,b){return a[1] - b[1]}).reverse();
+    ows.sort(function(a,b){return a[1] - b[1]}).reverse();
+   /* for(a in ptvs){
+    	$("#ptv").append("<li><b>"+ptvs[a][0]+"</b> : "+ptvs[a][1]+"</li><br>");
+    }*/
+   $("#res").append("<h2>Past Tense Verbs</h2>"+JSON.stringify(ptvs)+"<h2>Present Tense Verbs</h2>"+JSON.stringify(prvs)+"<h2>Emphasized Nouns</h2>"+JSON.stringify(pns)+"<h2>Big Words</h2>"+JSON.stringify(bws)+"<h2>Other Words</h2>"+JSON.stringify(ows));
+  });
+  
+})
+</script>
